@@ -16,7 +16,7 @@ app.use(authroute);
 app.use(passwordReset);
 
 
-// app.get('/user', userCtrl.addUser)
+app.get('/user', userCtrl.addUser)
 // app.post('/user', userCtrl.postUser)
 app.delete('/user/:id', userCtrl.deleteUser)
 // app.post('/email', emailverification)

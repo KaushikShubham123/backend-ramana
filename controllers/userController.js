@@ -9,7 +9,7 @@ const createToken = require('../utiity/createToken');
 
 
 var addUser = async (req, res) => {
-  // User.
+
   const data = await User.findAll();
   res.status(200).json({ data: data });
 
@@ -54,12 +54,13 @@ const authenticateUser = async (data) => {
     email
   }
   const token = await createToken(tokenData);
-  // await User.update ({token:token,{ where: { email }} });
-  //assign user token
-  fetchedUser.token = token;
-  // await User.update ({token:fetchedUser.token,{ where: { email }} })
 
-  return fetchedUser;
+  //assign user token
+  // fetchedUser.token = token;
+
+  return { fetchedUser, token };
+
+
 
 
 }
@@ -166,7 +167,7 @@ const verifyUserEmail = async ({ email, otp }) => {
 
   await User.update({ verified: true }, { where: { email } });
 
-  await deleteOTP({ where: { email } });
+  await deleteOTP(email);
   return true;
 }
 
@@ -198,8 +199,8 @@ const resetUserPassword = async ({ email, otp, newPassword }) => {
   //now update record with new password
   if (newPassword.length < 8) { throw Error("Password is too short") }
   const hashedNewPassword = await hashData(newPassword);
-  await User.update({ where: { email } }, { password: hashedNewPassword },);
-  await deleteOTP({ email });
+  await User.update({ password: hashedNewPassword }, { where: { email } });
+  await deleteOTP(email);
 
 
   return;
