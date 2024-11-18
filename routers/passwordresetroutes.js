@@ -3,7 +3,7 @@ const router = express.Router();
 var userCtrl = require('../controllers/userController')
 
 
-router.post("/resetpassword", async (req, res) => {
+router.post("/forgetpassword", async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
@@ -19,4 +19,14 @@ router.post("/resetpassword", async (req, res) => {
   }
 }
 );
-module.exports = router
+
+router.post("/reset", async (req, res) => {
+  let { email, otp, newPassword } = req.body;
+  if (!(email && otp && newPassword)) {
+    throw Error("Empty crediantials are not allowed");
+  }
+  await userCtrl.resetUserPassword({ email, otp, newPassword })
+  res.status(200).json({ email, passwordreset: true })
+
+})
+module.exports = router;

@@ -1,29 +1,82 @@
 var db = require('../models');
 const User = db.user;
-const Otp = db.otp
+const Otp = db.otp;
 const generateOTP = require('../utiity/generateOtp');
-const sendEmail = require('../utiity/sendemail')
+const sendEmail = require('../utiity/sendemail');
+const { hashData, verifyingHashedData } = require('../utiity/hashData');
+const createToken = require('../utiity/createToken');
+// const { where } = require('sequelize');
 
 
 var addUser = async (req, res) => {
   // User.
   const data = await User.findAll();
   res.status(200).json({ data: data });
+
 }
-var postUser = async (req, res) => {
-  var postData = req.body;
-  let data;
-  if (postData.length > 1) {
-    data = await User.bulkCreate(postData)
-  }
+
+// for creating new user
+const createNewUser = async (data) => {
+  const { firstName, lastName, country, email, companyName, mobile, password } = data;
+  let existingUser = await User.findOne({ where: { email } });
+  if (existingUser) { throw Error("User with the provided email already exists"); }
   else {
-    data = await User.create(postData)
-  }
-  res.status(200).json({ data: data });
 
+    const hashedPassword = await hashData(password);
+    const newUser = new User({
+      firstName,
+      lastName,
+      country,
+      email,
+      companyName,
+      mobile,
+      password: hashedPassword
+
+    })
+    const createdUser = await newUser.save();
+    return { createdUser };
+  }
+}
+
+//For User sign In
+const authenticateUser = async (data) => {
+  const { email, password } = data;
+  const fetchedUser = await User.findOne({ where: { email } });
+  if (!fetchedUser) { throw Error("Invalid credentials entered") }
+
+  const hashedPassword = fetchedUser.password;
+  const paswordMatch = await verifyingHashedData(password, hashedPassword);
+  if (!paswordMatch) { throw Error("Invalid password Entered"); }
+
+  //create user token
+  const tokenData = {
+    userid: fetchedUser.id,
+    email
+  }
+  const token = await createToken(tokenData);
+  // await User.update ({token:token,{ where: { email }} });
+  //assign user token
+  fetchedUser.token = token;
+  // await User.update ({token:fetchedUser.token,{ where: { email }} })
+
+  return fetchedUser;
 
 
 }
+// var postUser = async (req, res) => {
+//   var postData = req.body;
+//   let data;
+//   if (postData.length > 1) {
+//     data = await User.bulkCreate(postData)
+//   }
+//   else {
+//     data = await User.create(postData)
+//   }
+//   res.status(200).json({ data: data });
+
+
+
+// }
 var deleteUser = async (req, res) => {
 
   const data = await User.destroy({
@@ -35,7 +88,7 @@ var deleteUser = async (req, res) => {
 
 
 
-const sendOTP = async ({ email, subject, message, duration = 1 }) => {
+const sendOTP = async ({ email, subject, message, duration = 15 }) => {
 
 
   if (!(email && subject && message)) {
@@ -75,7 +128,7 @@ const sendOTP = async ({ email, subject, message, duration = 1 }) => {
 const verifyOTP = async ({ email, otp }) => {
 
   if (!(email && otp)) {
-    throw Error("Provides value for email,otp");
+    throw Error("Provide value for email,otp");
   }
   const matchedOTPRecords = await Otp.findOne({
     where: { email }
@@ -113,7 +166,7 @@ const verifyUserEmail = async ({ email, otp }) => {
 
   await User.update({ verified: true }, { where: { email } });
 
-  await deleteOTP(email);
+  await deleteOTP({ where: { email } });
   return true;
 }
 
@@ -134,7 +187,22 @@ const sendPasswordResetOtpEmail = async (email) => {
   }
   const createdOTP = await sendOTP(otpDetails);
   return createdOTP;
+}
 
+
+const resetUserPassword = async ({ email, otp, newPassword }) => {
+  const validOTP = await verifyOTP({ email, otp })
+  if (!validOTP) {
+    throw Error("Invalid code passed.Checkyour inbox.")
+  }
+  //now update record with new password
+  if (newPassword.length < 8) { throw Error("Password is too short") }
+  const hashedNewPassword = await hashData(newPassword);
+  await User.update({ where: { email } }, { password: hashedNewPassword },);
+  await deleteOTP({ email });
+
+
+  return;
 
 }
 
@@ -142,10 +210,13 @@ const sendPasswordResetOtpEmail = async (email) => {
 
 module.exports = {
   addUser,
-  postUser,
+  // postUser,
   deleteUser,
   sendOTP,
   verifyOTP,
   verifyUserEmail,
-  sendPasswordResetOtpEmail
+  sendPasswordResetOtpEmail,
+  createNewUser,
+  authenticateUser,
+  resetUserPassword
 }

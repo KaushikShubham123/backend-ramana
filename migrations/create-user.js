@@ -16,7 +16,8 @@ module.exports = {
         type: Sequelize.STRING
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       country: {
         type: Sequelize.STRING
@@ -31,7 +32,12 @@ module.exports = {
         type: Sequelize.STRING
       },
       verified: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+
+      },
+      token: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -40,7 +46,8 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },
+
     });
   },
   async down(queryInterface, /* Sequelize */) {
