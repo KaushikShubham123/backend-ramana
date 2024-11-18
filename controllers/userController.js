@@ -166,7 +166,7 @@ const verifyUserEmail = async ({ email, otp }) => {
 
   await User.update({ verified: true }, { where: { email } });
 
-  await deleteOTP({ where: { email } });
+  await deleteOTP( email);
   return true;
 }
 
