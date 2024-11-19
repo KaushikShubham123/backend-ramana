@@ -1,6 +1,7 @@
 var db = require('../models');
 const User = db.user;
 const Otp = db.otp;
+const UserProfile = db.userProfile
 const generateOTP = require('../utiity/generateOtp');
 const sendEmail = require('../utiity/sendemail');
 const { hashData, verifyingHashedData } = require('../utiity/hashData');
@@ -207,6 +208,31 @@ const resetUserPassword = async ({ email, otp, newPassword }) => {
 
 }
 
+const userProfile = async (data) => {
+  const { retailerName, outletAddress, latitude, longitude, followUpDate, leadPhase, newImage, mobile } = data;
+  const existingUser = await User.findOne({ where: { mobile } });
+  if (!existingUser) {
+    throw Error("There's no user available for the provided contact number");
+  }
+  const retailerID = existingUser.id;
+  const createdUserProfile = new UserProfile({
+
+    retailerName,
+    contactNo: mobile,
+    outletAddress,
+    latitude,
+    longitude,
+    followUpDate,
+    leadPhase,
+    newImage,
+    retailer_id: retailerID,
+
+  })
+  const saveUserProfile = await createdUserProfile.save();
+  return saveUserProfile;
+}
+
+
 
 
 module.exports = {
@@ -219,5 +245,6 @@ module.exports = {
   sendPasswordResetOtpEmail,
   createNewUser,
   authenticateUser,
-  resetUserPassword
+  resetUserPassword,
+  userProfile
 }

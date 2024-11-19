@@ -50,5 +50,10 @@ db.Sequelize = Sequelize;
 db.user = require('./user')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 
 db.otp = require('./otp')(sequelize, Sequelize.DataTypes, Sequelize.Model);
+db.userProfile = require('./user_profiles')(sequelize, Sequelize.DataTypes, Sequelize.Model);
+
+db.user.hasOne(db.userProfile);
+db.userProfile.belongsTo(db.user);
+
 db.sequelize.sync({ force: false });
 module.exports = db;
