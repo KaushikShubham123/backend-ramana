@@ -90,7 +90,7 @@ var deleteUser = async (req, res) => {
 
 
 
-const sendOTP = async ({ email, subject, message, duration = 15 }) => {
+const sendOTP = async ({ email, subject, message, duration = 2 }) => {
 
 
   if (!(email && subject && message)) {
@@ -118,7 +118,7 @@ const sendOTP = async ({ email, subject, message, duration = 15 }) => {
   const newOTP = await new Otp({
     email,
     otp: otp,
-    expiresAT: Date.now() + 60000 * 15 * +duration,
+    expiresAT: Date.now() + 60000 * 2 * +duration,
   });
   const createdOTPRecord = await newOTP.save();
 
@@ -176,7 +176,7 @@ const verifyUserEmail = async ({ email, otp }) => {
 //To reset Password
 const sendPasswordResetOtpEmail = async (email) => {
   //check if an account exists
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ where: { email } });
   if (!existingUser) {
     throw Error("There's no account for the provided email");
   }
