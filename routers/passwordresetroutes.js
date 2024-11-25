@@ -21,12 +21,18 @@ router.post("/forgetpassword", async (req, res) => {
 );
 
 router.post("/reset", async (req, res) => {
-  let { email, otp, newPassword } = req.body;
-  if (!(email && otp && newPassword)) {
-    throw Error("Empty crediantials are not allowed");
+  try {
+    let { email, otp, newPassword } = req.body;
+    if (!(email && otp && newPassword)) {
+      throw Error("Empty crediantials are not allowed");
+    }
+    await userCtrl.resetUserPassword({ email, otp, newPassword })
+    res.status(200).json({ email, passwordreset: true })
   }
-  await userCtrl.resetUserPassword({ email, otp, newPassword })
-  res.status(200).json({ email, passwordreset: true })
+  catch (error) {
+    res.status(400).send(error.message);
+  }
+
 
 })
 module.exports = router;

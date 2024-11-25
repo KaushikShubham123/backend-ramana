@@ -1,15 +1,18 @@
 var db = require('../models');
 const User = db.user;
 const Otp = db.otp;
-const UserProfile = db.userProfile
+const UserProfile = db.userProfile;
+const Vendor = db.vendor;
 const generateOTP = require('../utiity/generateOtp');
 const sendEmail = require('../utiity/sendemail');
 const { hashData, verifyingHashedData } = require('../utiity/hashData');
 const createToken = require('../utiity/createToken');
+// const { use } = require('../routers/authroutes');
+// const vendor = require('../models/vendor');
 // const { where } = require('sequelize');
 
 
-var addUser = async (req, res) => {
+var getUser = async (req, res) => {
 
   const data = await User.findAll();
   res.status(200).json({ data: data });
@@ -19,23 +22,36 @@ var addUser = async (req, res) => {
 // for creating new user
 const createNewUser = async (data) => {
   const { firstName, lastName, country, email, companyName, mobile, password } = data;
+
+
   let existingUser = await User.findOne({ where: { email } });
-  if (existingUser) { throw Error("User with the provided email already exists"); }
+
+  if (existingUser) {
+    throw new Error("User with the provided email already exists")
+  }
+
+  existingUser = await User.findOne({ where: { mobile } });
+  if (existingUser) {
+    throw new Error("User with the provided contact number already exists")
+  }
+  // if (existingUser.email && existingUser.mobile) { throw Error("User with given email and mobile already exists") }
+
   else {
 
     const hashedPassword = await hashData(password);
-    const newUser = new User({
+    const newUser = await User.create({
       firstName,
       lastName,
       country,
       email,
       companyName,
       mobile,
-      password: hashedPassword
+      password: hashedPassword,
+      verified: true
 
     })
-    const createdUser = await newUser.save();
-    return { createdUser };
+    // const createdUser = await newUser.save();
+    return (newUser);
   }
 }
 
@@ -60,25 +76,8 @@ const authenticateUser = async (data) => {
   // fetchedUser.token = token;
 
   return { fetchedUser, token };
-
-
-
-
 }
-// var postUser = async (req, res) => {
-//   var postData = req.body;
-//   let data;
-//   if (postData.length > 1) {
-//     data = await User.bulkCreate(postData)
-//   }
-//   else {
-//     data = await User.create(postData)
-//   }
-//   res.status(200).json({ data: data });
 
-
-
-// }
 var deleteUser = async (req, res) => {
 
   const data = await User.destroy({
@@ -94,7 +93,7 @@ const sendOTP = async ({ email, subject, message, duration = 2 }) => {
 
 
   if (!(email && subject && message)) {
-    throw Error("ProvideValues foremail,subject,message");
+    throw Error("Provide Values for email,subject,message");
   }
   //clear any Old  
   await Otp.destroy({ where: { email } });
@@ -137,6 +136,7 @@ const verifyOTP = async ({ email, otp }) => {
   });
 
   if (!matchedOTPRecords) {
+    await User.destroy({ where: { email } });
     throw Error("No otp records found")
   }
   const { expiresAT } = matchedOTPRecords;
@@ -150,7 +150,12 @@ const verifyOTP = async ({ email, otp }) => {
   if (otpFromDb == otp) {
     return true;
   }
-  else { return false; }
+
+  else {
+
+
+    return false;
+  }
 
 
 }
@@ -163,10 +168,11 @@ const verifyUserEmail = async ({ email, otp }) => {
 
   const validOTP = await verifyOTP({ email, otp });
   if (!validOTP) {
-    throw Error("Invalid code passed.Checkyour inbox.")
+    throw Error("Invalid code passed.Checkyour inbox.");
+    // await User.destroy({ where: { email } })
   }
 
-  await User.update({ verified: true }, { where: { email } });
+  // await User.update({ verified: true }, { where: { email } });
 
   await deleteOTP(email);
   return true;
@@ -207,16 +213,22 @@ const resetUserPassword = async ({ email, otp, newPassword }) => {
   return;
 
 }
+//UserProfile-Controller
 
 const userProfile = async (data) => {
   const { retailerName, outletAddress, latitude, longitude, followUpDate, leadPhase, newImage, mobile } = data;
-  const existingUser = await User.findOne({ where: { mobile } });
+
+  let existingUser = await UserProfile.findOne({ where: { contactNo: mobile } });
+  if (existingUser) {
+    throw new Error("There's user-profile available for the provided contact number");
+  }
+  existingUser = await User.findOne({ where: { mobile } });
   if (!existingUser) {
-    throw Error("There's no user available for the provided contact number");
+    throw new Error("There's no user available for the provided contact number");
   }
   const retailerID = existingUser.id;
   const createdUserProfile = new UserProfile({
-
+    salesman_id: retailerID,
     retailerName,
     contactNo: mobile,
     outletAddress,
@@ -224,20 +236,55 @@ const userProfile = async (data) => {
     longitude,
     followUpDate,
     leadPhase,
-    newImage,
-    retailer_id: retailerID,
+    newImage
+
 
   })
   const saveUserProfile = await createdUserProfile.save();
   return saveUserProfile;
 }
 
+const vendorProfile = async ({ mobile }) => {
+  const vendorExists = await Vendor.findOne({ where: { mobile } })
+  if (vendorExists) { throw Error("Vendor exists with provided contact number"); }
+  let existingUser = await User.findOne({ where: { mobile } });
+
+  if (!existingUser) {
+    throw Error("There's no user available for the provided contact number");
+  }
+  let userInUserProfile = await UserProfile.findOne({ where: { contactNo: mobile } });
+  if (!userInUserProfile) { throw Error("There's no user profile  available for the provided contact number in User Profile"); }
+
+  const createdVendorProfile = new Vendor({
+    firstName: existingUser.firstName,
+    lastName: existingUser.lastName,
+    address: userInUserProfile.outletAddress,
+    mobile: parseInt(existingUser.mobile),
+    email: existingUser.email,
+    companyName: existingUser.companyName,
+
+  })
+
+  const saveUserProfile = await createdVendorProfile.save();
+
+  return saveUserProfile;
+}
+
+
+var deleteUserProfile = async (req, res) => {
+
+  const data = await Vendor.destroy({
+    where: { id: req.params.id }
+  }
+  );
+  res.status(200).json({ data: data });
+}
+
 
 
 
 module.exports = {
-  addUser,
-  // postUser,
+  getUser,
   deleteUser,
   sendOTP,
   verifyOTP,
@@ -246,5 +293,7 @@ module.exports = {
   createNewUser,
   authenticateUser,
   resetUserPassword,
-  userProfile
+  userProfile,
+  vendorProfile,
+  deleteUserProfile
 }
