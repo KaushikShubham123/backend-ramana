@@ -55,6 +55,7 @@ db.vendor = require('./vendor')(sequelize, Sequelize.DataTypes, Sequelize.Model)
 db.productCategory = require('./productcategory')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 db.productTable = require('./producttable')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 db.attendanceTable = require('./attendancetable')(sequelize, Sequelize.DataTypes, Sequelize.Model);
+db.userform = require('./userform')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 // db.user.hasOne(db.userProfile);
 // db.userProfile.belongsTo(db.user, {
 //   foreignKey: { name: "salesman_id" }

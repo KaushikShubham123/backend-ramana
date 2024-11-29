@@ -8,9 +8,9 @@ const attendance = async (data) => {
 
   const { photoUrl, longitude, latitude, factoryName, id, status } = data;
 
-  if (!(photoUrl && longitude && latitude && factoryName && id && status)) {
-    throw Error("Please provide all required details");
-  }
+  // if (!(photoUrl && longitude && latitude && factoryName && id && status)) {
+  //   throw Error("Please provide all required details");
+  // }
 
 
   // Step 1: Check if the employee exists
@@ -108,50 +108,6 @@ const attendance = async (data) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const outAttendance = async (data) => {
-
-//   const { outPhotoUrl, outLongitude, outLatitude, factoryName, id } = data;
-
-//   if (!(outPhotoUrl && outLongitude && outLatitude && factoryName && id)) {
-//     throw Error("Provide proper credentials");
-//   }
-
-//   const existingUser = await User.findOne({ where: { id } });
-//   if (!existingUser) {
-//     throw new Error("Employee doesn't exist with given ID")
-//   }
-//   // const attendanceAlreadyRecorded = await AttendanceTable.findOne({ where: { employeeId: id } });
-//   // if (attendanceAlreadyRecorded) {
-//   //   throw new Error("Attendance for given Employee ID already captured")
-//   // }
-
-
-//   const outTimeStamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
-//   const todayOutAttendance = await AttendanceTable.create({
-//     outPhotoUrl,
-//     outLongitude,
-//     outLatitude,
-//     factoryName,
-//     employeeId: existingUser.id,
-//     outTime: outTimeStamp
-//   });
-
-//   return todayOutAttendance;
-// }
 
 var getEmployeeAttendance = async (req, res) => {
 

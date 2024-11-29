@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors')
 var bodyParser = require('body-parser')
 require('./models')
 // const nodemailer = require("nodemailer")
@@ -12,10 +13,12 @@ const userprofile = require('./routers/userprofileroutes')
 const vendorprofile = require('./routers/vendorroutes')
 const product = require('./routers/productroutes')
 const attendancerotues = require('./routers/attendancerotues')
+const userform = require('./routers/userfromroutes')
+
 
 
 app.use(bodyParser.json());
-// app.use("/api/v1")
+app.use(cors());
 
 app.use(authroute);
 app.use(passwordReset);
@@ -23,6 +26,7 @@ app.use(userprofile);
 app.use(vendorprofile);
 app.use(product);
 app.use(attendancerotues)
+app.use(userform)
 
 
 app.get('/user', userCtrl.getUser)
