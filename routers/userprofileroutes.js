@@ -27,4 +27,7 @@ router.post("/userprofile", async (req, res) => {
     res.status(400).send(error.message);
   }
 });
+
+router.get('/leads/:userId', userCtrl.getUserId)
+router.get('/leads/leadId/:userId', userCtrl.getUserLeadId)
 module.exports = router;

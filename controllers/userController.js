@@ -244,6 +244,23 @@ const userProfile = async (data) => {
   return saveUserProfile;
 }
 
+// const getUserProfile=async()
+
+var getUserId = async (req, res) => {
+  const id = req.params.userId;
+  const data = await UserProfile.findAll({ where: { salesman_id: id } });
+
+  res.status(200).json({ data: data });
+
+}
+var getUserLeadId = async (req, res) => {
+  const id = req.params.userId;
+  const data = await UserProfile.findAll({ where: { id } });
+
+  res.status(200).json({ data: data });
+
+}
+
 const vendorProfile = async ({ mobile }) => {
   const vendorExists = await Vendor.findOne({ where: { mobile } })
   if (vendorExists) { throw Error("Vendor exists with provided contact number"); }
@@ -294,6 +311,9 @@ module.exports = {
   authenticateUser,
   resetUserPassword,
   userProfile,
+  deleteUserProfile,
+  getUserId,
+  getUserLeadId,
   vendorProfile,
-  deleteUserProfile
+
 }
