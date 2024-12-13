@@ -6,18 +6,15 @@ var userCtrl = require('../controllers/userController')
 router.post("/userprofile", async (req, res) => {
   try {
     let {
-      retailerName, mobile,
-      contactNo,
-      outletAddress, latitude, longitude, followUpDate, leadPhase, newImage } = req.body;
-
-    if (!(mobile)) {
-      throw Error("Empty crediantials are not allowed");
+      retailerName, mobile, userid, outletAddress, latitude, longitude, followUpDate, leadPhase, newImage } = req.body;
+    if (!(userid && mobile)) {
+      throw Error("Provide user Id and mobile number")
     }
+    // if (!(mobile)) {
+    //   throw Error("Empty crediantials are not allowed");
+    // }
     const newUserProfile = await userCtrl.userProfile({
-      retailerName,
-      mobile,
-      contactNo,
-      outletAddress, latitude, longitude, followUpDate, leadPhase, newImage
+      retailerName, mobile, outletAddress, latitude, longitude, followUpDate, leadPhase, newImage, userid
     });
     res.status(200).json(newUserProfile);
 

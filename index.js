@@ -10,23 +10,31 @@ const app = express()
 const authroute = require('./routers/authroutes')
 const passwordReset = require('./routers/passwordresetroutes')
 const userprofile = require('./routers/userprofileroutes')
-const vendorprofile = require('./routers/vendorroutes')
+// const vendorprofile = require('./routers/vendorcompanydetailsroutes.js.js')
+
+const attendanceroutes = require('./routers/attendancerotues')
+const userform = require('./routers/userformroutes.js')
+const updateprofile = require('./routers/updateprofile')
+const addsubvendor = require('./routers/subvendorroutes')
+const { authenticateToken } = require('./controllers/updateProfileController')
+const addcompanydetails = require('./routers/vendorcompanydetailsroutes.js')
 const product = require('./routers/productroutes')
-const attendancerotues = require('./routers/attendancerotues')
-const userform = require('./routers/userfromroutes')
-
-
 
 app.use(bodyParser.json());
 app.use(cors());
 
 app.use(authroute);
 app.use(passwordReset);
+
+app.use(authenticateToken);
 app.use(userprofile);
-app.use(vendorprofile);
+// app.use(vendorprofile);
 app.use(product);
-app.use(attendancerotues)
+app.use(attendanceroutes)
 app.use(userform)
+app.use(updateprofile)
+app.use(addsubvendor);
+app.use(addcompanydetails);
 
 
 app.get('/user', userCtrl.getUser)
@@ -35,6 +43,6 @@ app.delete('/user/:id', userCtrl.deleteUser)
 // app.post('/email', emailverification)
 // app.patch('/user', userCtrl.patchUser)
 
-app.listen(3000, () => {
-  console.log('App will run on: http://localhost:3000')
+app.listen(4000, () => {
+  console.log('App will run on: http://localhost:4000')
 })

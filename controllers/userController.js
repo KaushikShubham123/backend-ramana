@@ -3,10 +3,12 @@ const User = db.user;
 const Otp = db.otp;
 const UserProfile = db.userProfile;
 const Vendor = db.vendor;
+const CompanyDetails = db.vendorcompanydetails;
 const generateOTP = require('../utiity/generateOtp');
 const sendEmail = require('../utiity/sendemail');
 const { hashData, verifyingHashedData } = require('../utiity/hashData');
 const createToken = require('../utiity/createToken');
+// const { where } = require('sequelize');
 // const { use } = require('../routers/authroutes');
 // const vendor = require('../models/vendor');
 // const { where } = require('sequelize');
@@ -21,7 +23,7 @@ var getUser = async (req, res) => {
 
 // for creating new user
 const createNewUser = async (data) => {
-  const { firstName, lastName, country, email, companyName, mobile, password } = data;
+  const { email, userType, mobile, password } = data;
 
 
   let existingUser = await User.findOne({ where: { email } });
@@ -40,14 +42,12 @@ const createNewUser = async (data) => {
 
     const hashedPassword = await hashData(password);
     const newUser = await User.create({
-      firstName,
-      lastName,
-      country,
+
       email,
-      companyName,
+      userType,
       mobile,
       password: hashedPassword,
-      verified: true
+      verified: false
 
     })
     // const createdUser = await newUser.save();
@@ -89,7 +89,7 @@ var deleteUser = async (req, res) => {
 
 
 
-const sendOTP = async ({ email, subject, message, duration = 2 }) => {
+const sendOTP = async ({ email, subject, message, duration = 2, otpFormatter = (otp) => { return otp; } }) => {
 
 
   if (!(email && subject && message)) {
@@ -108,7 +108,7 @@ const sendOTP = async ({ email, subject, message, duration = 2 }) => {
     subject,
     html: `<p>${message}</p>
         <p style= "color:tomato;font-size:25px,letter-spacing:2px;">
-        <b>${otp}</b>
+        <b>${otpFormatter(otp)}</b>
         </p>
         <p>This code <b>expires in ${duration} minute(s)</b></p>`,
   }
@@ -171,7 +171,13 @@ const verifyUserEmail = async ({ email, otp }) => {
     throw Error("Invalid code passed.Checkyour inbox.");
     // await User.destroy({ where: { email } })
   }
-
+  // else {
+  //   await User.create({ where: { email }, verified: true })
+  // }
+  await User.update(
+    { verified: true }, // Fields to update
+    { where: { email } } // Condition to identify the user
+  );
   // await User.update({ verified: true }, { where: { email } });
 
   await deleteOTP(email);
@@ -192,6 +198,7 @@ const sendPasswordResetOtpEmail = async (email) => {
     subject: "Password Reset",
     message: "Enter the code below to reset your password.",
     duration: 1,
+    otpFormatter: (otp) => { return `http://localhost:3000/auth-pass-change?email=${email}&otp=${otp}` }
   }
   const createdOTP = await sendOTP(otpDetails);
   return createdOTP;
@@ -216,15 +223,11 @@ const resetUserPassword = async ({ email, otp, newPassword }) => {
 //UserProfile-Controller
 
 const userProfile = async (data) => {
-  const { retailerName, outletAddress, latitude, longitude, followUpDate, leadPhase, newImage, mobile } = data;
+  const { retailerName, userid, outletAddress, latitude, longitude, followUpDate, leadPhase, newImage, mobile } = data;
 
-  let existingUser = await UserProfile.findOne({ where: { contactNo: mobile } });
-  if (existingUser) {
-    throw new Error("There's user-profile available for the provided contact number");
-  }
-  existingUser = await User.findOne({ where: { mobile } });
+  let existingUser = await User.findOne({ where: { id: userid } });
   if (!existingUser) {
-    throw new Error("There's no user available for the provided contact number");
+    throw new Error("There's no user available for the provided user Id");
   }
   const retailerID = existingUser.id;
   const createdUserProfile = new UserProfile({
@@ -261,28 +264,46 @@ var getUserLeadId = async (req, res) => {
 
 }
 
-const vendorProfile = async ({ mobile }) => {
-  const vendorExists = await Vendor.findOne({ where: { mobile } })
-  if (vendorExists) { throw Error("Vendor exists with provided contact number"); }
-  let existingUser = await User.findOne({ where: { mobile } });
+const VendorCompanyDetails = async (data) => {
 
-  if (!existingUser) {
-    throw Error("There's no user available for the provided contact number");
-  }
-  let userInUserProfile = await UserProfile.findOne({ where: { contactNo: mobile } });
-  if (!userInUserProfile) { throw Error("There's no user profile  available for the provided contact number in User Profile"); }
 
-  const createdVendorProfile = new Vendor({
-    firstName: existingUser.firstName,
-    lastName: existingUser.lastName,
-    address: userInUserProfile.outletAddress,
-    mobile: parseInt(existingUser.mobile),
-    email: existingUser.email,
-    companyName: existingUser.companyName,
+  const { creatorId,
+    companyName,
+    companyRegisteredNumber,
+    companyMobileNumber,
+    companyEmailAddress,
+    companyRegisteredDate,
+    companyAddress,
+    city,
+    country,
+    zipCode,
+    video } = data;
 
+  // const vendorExists = await Vendor.findOne({ where: { mobile } })
+  // if (vendorExists) { throw Error("Vendor exists with provided contact number"); }
+  // let existingUser = await User.findOne({ where: { mobile } });
+
+  // if (!existingUser) {
+  //   throw Error("There's no user available for the provided contact number");
+  // }
+  // let userInUserProfile = await UserProfile.findOne({ where: { contactNo: mobile } });
+  // if (!userInUserProfile) { throw Error("There's no user profile  available for the provided contact number in User Profile"); }
+
+  const createdCompanyDetails = new CompanyDetails({
+    creatorId,
+    companyName,
+    companyRegisteredNumber,
+    companyMobileNumber,
+    companyEmailAddress,
+    companyRegisteredDate,
+    companyAddress,
+    city,
+    country,
+    zipCode,
+    video
   })
 
-  const saveUserProfile = await createdVendorProfile.save();
+  const saveUserProfile = await createdCompanyDetails.save();
 
   return saveUserProfile;
 }
@@ -314,6 +335,6 @@ module.exports = {
   deleteUserProfile,
   getUserId,
   getUserLeadId,
-  vendorProfile,
+  VendorCompanyDetails,
 
 }

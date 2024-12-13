@@ -1,14 +1,19 @@
 const express = require('express')
+var db = require('../models');
+const User = db.user;
 const router = express.Router();
 var userCtrl = require('../controllers/productController')
 
-router.post("/productcategory", async (req, res) => {
+router.post("/addproduct", async (req, res) => {
   try {
-    const nameOfcategory = req.body;
+    const { productTitle, categories, productType, shortDesc, brand, unit, tags, exchangeable, refundable, productDesc, productImages, manufacturerName, manufacturerBrand, stocks, price, discount, status, visibility } = req.body;
 
-    if (!nameOfcategory) { throw Error("Provide category name"); }
+    // if (!req.body) { throw Error("Provide category name"); }
+    const userDetails = await User.findOne({ where: { id: req.userId } })
+
+    const vendorId = userDetails.vendorId
     // console.log("test");
-    const data = await userCtrl.createNewCategory(nameOfcategory);
+    const data = await userCtrl.createNewproduct({ vendorId, userId: req.userId, productTitle, categories, productType, shortDesc, brand, unit, tags, exchangeable, refundable, productDesc, productImages, manufacturerName, manufacturerBrand, stocks, price, discount, status, visibility });
 
     res.status(200).json(data);
 
@@ -21,7 +26,7 @@ router.post("/productcategory", async (req, res) => {
   }
 });
 
-router.delete("/productCategory/:id", userCtrl.deleteProductCategory)
+router.delete("/addproduct/:id", userCtrl.deleteProduct)
 
 
 module.exports = router;

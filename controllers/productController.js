@@ -1,20 +1,24 @@
 var db = require('../models');
-const ProductCategory = db.productCategory;
+const Product = db.productTable;
 // const ProductTable = db.productTable;
 
-const createNewCategory = async (nameOfcategory) => {
+const createNewproduct = async (data) => {
 
-  const newCategory = await ProductCategory.create(
-    nameOfcategory
+  const { vendorId, userId, productTitle, categories, productType, shortDesc, brand, unit, tags, exchangeable, refundable, productDesc, productImages, manufacturerName, manufacturerBrand, stocks, price, discount, status, visibility }
+    = data;
 
-  )
 
-  return newCategory;
+  const newProduct = await Product.create({
+    vendorId, userId, productTitle, categories, productType, shortDesc, brand, unit, tags, exchangeable, refundable, productDesc, productImages, manufacturerName, manufacturerBrand, stocks, price, discount, status, visibility
+  }
+  );
+  // const saveProduct = await newProduct.save();
+  return newProduct;
 }
 
-var deleteProductCategory = async (req, res) => {
+var deleteProduct = async (req, res) => {
 
-  const data = await ProductCategory.destroy({
+  const data = await Product.destroy({
     where: { id: req.params.id }
   }
   );
@@ -24,6 +28,6 @@ var deleteProductCategory = async (req, res) => {
 
 
 module.exports = {
-  createNewCategory,
-  deleteProductCategory
+  createNewproduct,
+  deleteProduct
 }

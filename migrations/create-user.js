@@ -9,29 +9,27 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      firstName: {
+      vendorId: {
         type: Sequelize.STRING
       },
-      lastName: {
+      status: {
         type: Sequelize.STRING
       },
       email: {
         type: Sequelize.STRING,
         unique: true
       },
-      country: {
+      mobile: {
         type: Sequelize.STRING
       },
-      mobile: {
-        type: Sequelize.STRING,
+      userType: {
+        type: Sequelize.ENUM('Vendor', 'Sub-Vendor', 'Customer', 'Admin'),
         unique: true
       },
       password: {
         type: Sequelize.STRING
       },
-      companyName: {
-        type: Sequelize.STRING
-      },
+
       verified: {
         type: Sequelize.BOOLEAN,
         defaultValue: false

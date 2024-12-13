@@ -52,18 +52,20 @@ db.user = require('./user')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 db.otp = require('./otp')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 db.userProfile = require('./user_profiles')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 db.vendor = require('./vendor')(sequelize, Sequelize.DataTypes, Sequelize.Model);
-db.productCategory = require('./productcategory')(sequelize, Sequelize.DataTypes, Sequelize.Model);
+// db.productCategory = require('./productcategory')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 db.productTable = require('./producttable')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 db.attendanceTable = require('./attendancetable')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 db.userform = require('./userform')(sequelize, Sequelize.DataTypes, Sequelize.Model);
+db.updateprofile = require('./updateprofile')(sequelize, Sequelize.DataTypes, Sequelize.Model);
+db.vendorcompanydetails = require('./vendorcompanydetails')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 // db.user.hasOne(db.userProfile);
 // db.userProfile.belongsTo(db.user, {
 //   foreignKey: { name: "salesman_id" }
 // });
 
-db.productTable.belongsTo(db.productCategory, {
-  foreignKey: { name: "categoryId" }
-});
+// db.productTable.belongsTo(db.productCategory, {
+//   foreignKey: { name: "categoryId" }
+// });
 // db.vendor.belongsTo(db.userProfile, {
 //   foreignKey: { name: "userProfileId" }
 // });

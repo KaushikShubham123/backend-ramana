@@ -9,7 +9,13 @@ const createToken = async (tokenData,
 
 
   return token;
-
-
+  // try{
+  //   const decoded =jwt.verify(token, processs.env.TOKEN_KEY);
+  //   req.user=decoded
+  //   next();
+  // }
+  // catch(err){console.error(err);
+  //   res.status(401).json({error:'Invalid Token'});
+  // }
 }
 module.exports = createToken;

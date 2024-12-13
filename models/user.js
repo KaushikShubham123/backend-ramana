@@ -1,6 +1,7 @@
 'use strict';
 const {
   Model,
+  ENUM
 
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
@@ -8,13 +9,12 @@ module.exports = (sequelize, DataTypes) => {
 
   }
   User.init({
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
+    vendorId: DataTypes.STRING,
+    status: DataTypes.STRING,
     email: DataTypes.STRING,
-    country: DataTypes.STRING,
     mobile: DataTypes.STRING,
     password: DataTypes.STRING,
-    companyName: DataTypes.STRING,
+    userType: ENUM('Vendor', 'Sub-Vendor', 'Customer', 'Admin'),
     verified: DataTypes.BOOLEAN,
 
   }, {

@@ -38,39 +38,37 @@ router.post("/send-otp", async (req, res) => {
 router.post("/signup", async (req, res) => {
   try {
 
-    let { firstName, lastName, country, email, companyName, mobile, password, otp } = req.body;
-    if (!(email && otp)) { throw Error("Empty otp details are not allowed"); }
-    // ver
-    await userCtrl.verifyUserEmail({ email, otp });
+    let { email, mobile, password, userType } = req.body;
 
-    firstName = firstName.trim();
-    lastName = lastName.trim();
-    country = country.trim();
-    email = email.trim();
-    companyName = companyName.trim();
-    mobile = mobile.trim();
-    password = password.trim();
-
-
-
-    if (!(firstName && email && country && mobile && password)) {
+    if (!(email && userType && mobile && password)) {
       throw Error("Empty input fields!");
     }
-    else if (!/^[a-zA-Z]*$/.test(firstName)) {
-      throw Error("Invalid name entered")
-    }
+    // else if (!/^[a-zA-Z]*$/.test(firstName)) {
+    //   throw Error("Invalid name entered")
+    // }
     else if (!/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
       throw Error("Invalid email entered");
     }
     else if (password.length < 8) {
       throw Error("Password is too short")
     }
+    //send otp
+
+    const Email = 'Email';
+    const Message = 'backend getting better';
+    const Duration = '2';
+
+    await userCtrl.sendOTP({
+      email,
+      subject: Email,
+      message: Message,
+      duration: Duration
+    });
 
 
     //good credentials, create new user 
     const createdUser = await userCtrl.createNewUser({
-      firstName,
-      lastName, country, email, companyName, mobile, password
+      email, userType, mobile, password
     });
 
 
