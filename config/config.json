@@ -1,12 +1,7 @@
 {
   "development": {
-<<<<<<< HEAD
     "username": "admin",
-    "password": "9646568306",
-=======
-    "username": "root",
-    "password": "Your_Password",
->>>>>>> e577230717a0eeccd0b3501213f6924ded4d4734
+    "password": "YOUR_PASSWORD",
     "database": "database_dev1",
     "host": "ramana-machines-db.chk4weis2dks.eu-north-1.rds.amazonaws.com",
     "dialect": "mysql"
