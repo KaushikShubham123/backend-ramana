@@ -19,12 +19,14 @@ const addsubvendor = require('./routers/subvendorroutes')
 const { authenticateToken } = require('./controllers/updateProfileController')
 const addcompanydetails = require('./routers/vendorcompanydetailsroutes.js')
 const product = require('./routers/productroutes')
+const customerQuery = require('./routers/customerqueryroutes.js')
 
 app.use(bodyParser.json());
 app.use(cors());
 
 app.use(authroute);
 app.use(passwordReset);
+app.use(customerQuery);
 
 app.use(authenticateToken);
 app.use(userprofile);
