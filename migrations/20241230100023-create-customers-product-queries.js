@@ -2,44 +2,34 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('VendorCompanyDetails', {
+    await queryInterface.createTable('CustomersProductQueries', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      creatorId: {
-        type: Sequelize.INTEGER
-      },
-      companyName: {
+      name: {
         type: Sequelize.STRING
       },
-      companyRegisteredNumber: {
+      productId: {
         type: Sequelize.STRING
       },
-      companyMobileNumber: {
+      email: {
         type: Sequelize.STRING
       },
-      companyEmailAddress: {
+      mobile: {
         type: Sequelize.STRING
       },
-      companyRegisteredDate: {
+     
+      city: {
         type: Sequelize.STRING
       },
-      companyAddress: {
+      country: {
         type: Sequelize.STRING
       },
-      companyCity: {
-        type: Sequelize.STRING
-      },
-      companyCountry: {
-        type: Sequelize.STRING
-      },
-      companyZipcode: {
-        type: Sequelize.STRING
-      },
-      video: {
+    
+      purchaseType: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -53,6 +43,7 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('VendorCompanyDetails');
+    await queryInterface.dropTable('CustomersProductQueries');
   }
 };
+

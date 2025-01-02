@@ -21,9 +21,9 @@ module.exports = (sequelize, DataTypes) => {
     companyEmailAddress: DataTypes.STRING,
     companyRegisteredDate: DataTypes.STRING,
     companyAddress: DataTypes.STRING(1000),
-    city: DataTypes.STRING,
-    country: DataTypes.STRING,
-    zipCode: DataTypes.STRING,
+    companyCity: DataTypes.STRING,
+    companyCountry: DataTypes.STRING,
+    companyZipcode: DataTypes.STRING,
     video: DataTypes.STRING(10000)
   }, {
     sequelize,

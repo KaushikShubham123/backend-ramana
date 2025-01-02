@@ -2,7 +2,7 @@ var db = require('../models');
 const User = db.user;
 const Otp = db.otp;
 const UserProfile = db.userProfile;
-const Vendor = db.vendor;
+// const Vendor = db.vendor;
 const CompanyDetails = db.vendorcompanydetails;
 const generateOTP = require('../utiity/generateOtp');
 const sendEmail = require('../utiity/sendemail');
@@ -32,10 +32,10 @@ const createNewUser = async (data) => {
     throw new Error("User with the provided email already exists")
   }
 
-  existingUser = await User.findOne({ where: { mobile } });
-  if (existingUser) {
-    throw new Error("User with the provided contact number already exists")
-  }
+  // existingUser = await User.findOne({ where: { mobile } });
+  // if (existingUser) {
+  //   throw new Error("User with the provided contact number already exists")
+  // }
   // if (existingUser.email && existingUser.mobile) { throw Error("User with given email and mobile already exists") }
 
   else {
@@ -136,7 +136,7 @@ const verifyOTP = async ({ email, otp }) => {
   });
 
   if (!matchedOTPRecords) {
-    await User.destroy({ where: { email } });
+    // await User.destroy({ where: { email } });
     throw Error("No otp records found")
   }
   const { expiresAT } = matchedOTPRecords;
@@ -197,7 +197,7 @@ const sendPasswordResetOtpEmail = async (email) => {
     email,
     subject: "Password Reset",
     message: "Enter the code below to reset your password.",
-    duration: 1,
+    duration: 2,
     otpFormatter: (otp) => { return `http://localhost:3000/auth-pass-change?email=${email}&otp=${otp}` }
   }
   const createdOTP = await sendOTP(otpDetails);
@@ -223,13 +223,14 @@ const resetUserPassword = async ({ email, otp, newPassword }) => {
 //UserProfile-Controller
 
 const userProfile = async (data) => {
-  const { retailerName, userid, outletAddress, latitude, longitude, followUpDate, leadPhase, newImage, mobile } = data;
+  const { retailerName, userid, outletAddress, latitude, longitude, followUpDate, leadPhase, /* newImage, */ mobile } = data;
 
   let existingUser = await User.findOne({ where: { id: userid } });
   if (!existingUser) {
     throw new Error("There's no user available for the provided user Id");
   }
   const retailerID = existingUser.id;
+  
   const createdUserProfile = new UserProfile({
     salesman_id: retailerID,
     retailerName,
@@ -239,7 +240,7 @@ const userProfile = async (data) => {
     longitude,
     followUpDate,
     leadPhase,
-    newImage
+    // newImage
 
 
   })
@@ -274,9 +275,9 @@ const VendorCompanyDetails = async (data) => {
     companyEmailAddress,
     companyRegisteredDate,
     companyAddress,
-    city,
-    country,
-    zipCode,
+    companyCity,
+    companyCountry,
+    companyZipcode,
     video } = data;
 
   // const vendorExists = await Vendor.findOne({ where: { mobile } })
@@ -297,9 +298,9 @@ const VendorCompanyDetails = async (data) => {
     companyEmailAddress,
     companyRegisteredDate,
     companyAddress,
-    city,
-    country,
-    zipCode,
+    companyCity,
+    companyCountry,
+    companyZipcode,
     video
   })
 
@@ -308,10 +309,19 @@ const VendorCompanyDetails = async (data) => {
   return saveUserProfile;
 }
 
+var getVendorCompanyDetails = async (req, res) => {
 
-var deleteUserProfile = async (req, res) => {
+  const data = await CompanyDetails.findAll({ where: { creatorId: req.userId } });
 
-  const data = await Vendor.destroy({
+  res.status(200).json({ data: data });
+
+}
+
+
+
+var deleteVendorCompanyDetails = async (req, res) => {
+
+  const data = await CompanyDetails.destroy({
     where: { id: req.params.id }
   }
   );
@@ -332,9 +342,10 @@ module.exports = {
   authenticateUser,
   resetUserPassword,
   userProfile,
-  deleteUserProfile,
   getUserId,
   getUserLeadId,
   VendorCompanyDetails,
+  getVendorCompanyDetails,
+  deleteVendorCompanyDetails
 
 }

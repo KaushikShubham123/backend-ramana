@@ -59,6 +59,7 @@ db.userform = require('./userform')(sequelize, Sequelize.DataTypes, Sequelize.Mo
 db.updateprofile = require('./updateprofile')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 db.vendorcompanydetails = require('./vendorcompanydetails')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 db.customerQueryForm = require('./customerQueryForm')(sequelize, Sequelize.DataTypes, Sequelize.Model);
+db.customerproductquery = require('./customersproductqueries')(sequelize, Sequelize.DataTypes, Sequelize.Model);
 // db.user.hasOne(db.userProfile);
 // db.userProfile.belongsTo(db.user, {
 //   foreignKey: { name: "salesman_id" }

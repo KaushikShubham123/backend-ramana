@@ -36,6 +36,9 @@ module.exports = {
       refundable: {
         type: Sequelize.BOOLEAN
       },
+      specifications: {
+        type: Sequelize.JSON
+      },
       productDesc: {
         type: Sequelize.STRING
       },

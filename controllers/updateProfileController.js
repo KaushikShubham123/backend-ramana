@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const TOKEN_KEY = process.env.TOKEN_KEY;
 const UpdateProfile = db.updateprofile;
 
+
 // Middleware to authenticate token and decode user info
 const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -13,6 +14,13 @@ const authenticateToken = async (req, res, next) => {
   try {
 
     const decoded = await jwt.verify(token, TOKEN_KEY);
+
+    // Check if token is expired
+    const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+    if (decoded.exp < currentTime) {
+      return res.status(401).json({ error: "Token has expired" });
+    }
+
     console.log({ decoded })
 
     req.userId = decoded.userid; // Attach decoded user ID to the request object
@@ -52,10 +60,37 @@ const createUpdateProfile = async (data) => {
 
 };
 
-const getupdateProfile = async (req, res) => {
-  const id = req.params.id;
+const updateProfile =async(data)=>{
 
-  const data = await UpdateProfile.findOne({ where: { id } });
+  const { firstName, lastName, mobile, dob, city, country, zipCode, address, userId } = data
+    // Fetch existing profile by userId
+    const existingProfile = await UpdateProfile.findOne({where:{ userId}});
+
+    // if (!existingProfile) {
+    //   throw new Error("Profile not exist, fill all fields.");
+    // }
+
+    // Update only provided fields
+    if (firstName !== undefined) existingProfile.firstName = firstName;
+    if (lastName !== undefined) existingProfile.lastName = lastName;
+    if (mobile !== undefined) existingProfile.mobile = mobile;
+    if (dob !== undefined) existingProfile.dob = dob;
+    if (city !== undefined) existingProfile.city = city;
+    if (country !== undefined) existingProfile.country = country;
+    if (zipCode !== undefined) existingProfile.zipCode = zipCode;
+    if (address !== undefined) existingProfile.address = address;
+
+    // Save the updated profile
+    await existingProfile.save();
+
+
+     return existingProfile;
+
+}
+
+
+const getupdateProfile = async (req, res) => {
+  const data = await UpdateProfile.findOne({ where: { userId: req.userId } });
   res.status(200).json({ data: data });
 }
 
@@ -64,6 +99,7 @@ const getupdateProfile = async (req, res) => {
 module.exports = {
   authenticateToken,
   createUpdateProfile,
+  updateProfile,
   getupdateProfile
 };
 

@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router();
 var userCtrl = require('../controllers/userController')
-
+var productController = require('../controllers/productController')
 
 
 // user otp verification
@@ -12,7 +12,7 @@ router.post("/send-otp", async (req, res) => {
 
 
     const Email = 'Email';
-    const Message = 'backend getting better';
+    const Message = 'Code';
     const Duration = '2';
 
     await userCtrl.sendOTP({
@@ -55,7 +55,7 @@ router.post("/signup", async (req, res) => {
     //send otp
 
     const Email = 'Email';
-    const Message = 'backend getting better';
+    const Message = 'Your code for verification is';
     const Duration = '2';
 
     await userCtrl.sendOTP({
@@ -120,5 +120,16 @@ router.post("/verify", async (req, res) => {
   }
 
 })
+
+
+//To get all products
+
+router.get('/getallproducts',productController.getAllProducts)
+
+//To get product by id
+
+router.get('/getproducts/:id', productController.getProductById)
+
+
 
 module.exports = router;

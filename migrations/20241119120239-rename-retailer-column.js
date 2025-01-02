@@ -7,7 +7,7 @@ module.exports = {
     //  * Add altering commands here.
     //  *
     //  * Example:
-    await queryInterface.renameColumn('User_Profiles', 'retailer_id', 'salesman_id');
+    await queryInterface.renameColumn('User_Profiles', 'salesman_id', 'salesman_id');
     //  */
   },
 

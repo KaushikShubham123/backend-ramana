@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     tags: DataTypes.STRING(100),
     exchangeable: DataTypes.BOOLEAN,
     refundable: DataTypes.BOOLEAN,
+    specifications:DataTypes.JSON,
     productDesc: DataTypes.STRING(2000),
     productImages: DataTypes.STRING(10000),
     manufacturerName: DataTypes.STRING(100),

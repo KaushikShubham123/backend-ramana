@@ -16,10 +16,14 @@ const attendanceroutes = require('./routers/attendancerotues')
 const userform = require('./routers/userformroutes.js')
 const updateprofile = require('./routers/updateprofile')
 const addsubvendor = require('./routers/subvendorroutes')
+
+
+const product = require('./routers/productroutes')
 const { authenticateToken } = require('./controllers/updateProfileController')
 const addcompanydetails = require('./routers/vendorcompanydetailsroutes.js')
-const product = require('./routers/productroutes')
+
 const customerQuery = require('./routers/customerqueryroutes.js')
+const customerProductQuery = require('./routers/customerproductqueryroutes.js')
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -28,15 +32,20 @@ app.use(authroute);
 app.use(passwordReset);
 app.use(customerQuery);
 
+app.use(customerProductQuery)
+app.use(attendanceroutes)
+
 app.use(authenticateToken);
 app.use(userprofile);
 // app.use(vendorprofile);
-app.use(product);
-app.use(attendanceroutes)
+
+
 app.use(userform)
 app.use(updateprofile)
 app.use(addsubvendor);
 app.use(addcompanydetails);
+
+app.use(product);
 
 
 app.get('/user', userCtrl.getUser)

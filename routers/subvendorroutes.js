@@ -15,6 +15,16 @@ router.post("/addsubvendor", async (req, res) => {
     if (!(email && mobile)) {
       throw Error("Empty input fields!");
     }
+
+    //find person made company first or not
+    const companycreator = await User.findOne({ where: { id: req.userId } })
+
+    if (!companycreator.vendorId) { throw Error("Please add company details first") };
+
+    const subvendorExists = await User.findOne({ where: { email } })
+
+    if (subvendorExists) { throw Error("Person with given email already exists") };
+
     // else if (!/^[a-zA-Z]*$/.test(firstName)) {
     //   throw Error("Invalid name entered")
     // }
@@ -35,7 +45,6 @@ router.post("/addsubvendor", async (req, res) => {
       email, userType: "Sub-Vendor", mobile, password
     });
 
-    const companycreator = await User.findOne({ where: { id: req.userId } })
 
     createdUser.verified = true
     createdUser.vendorId = companycreator.vendorId
@@ -68,6 +77,24 @@ router.post("/addsubvendor", async (req, res) => {
   catch (error) { res.status(400).send(error.message); }
 
 })
+
+
+var getSubvendors = async (req, res) => {
+
+  // find user
+  const userdata = await User.findOne({ where: { id: req.userId } });
+  const vendorId = userdata.vendorId;
+  const userType = "Sub-Vendor";
+  const data = await User.findAll({ where: { vendorId, userType } });
+
+  res.status(200).json({ data: data });
+
+}
+
+
+
+router.get('/getsubvendors', getSubvendors)
+getSubvendors
 module.exports = router;
 
 
